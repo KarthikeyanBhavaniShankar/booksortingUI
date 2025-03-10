@@ -1,0 +1,726 @@
+from typing import List
+import string
+
+#P1: load_data 
+
+def book_category_dictionary(name_of_the_file:str)->List: 
+    """
+    Returns a dictonary/list based on the stored given data and 'category' as the dictionary key.
+      f = open('google_books_dataset.csv')  
+    read = csv.reader(f) 
+>>>[evaluate T127_load_data.py]
+>>>book_category_dictionary('google_books_dataset.csv')
+   [{'category': [{'title': 'title', 'author': 'author', 'language': 'language', 'rating': 'rating', 'publisher': 'publisher', 'pages': 'pages'}]}, {'Fiction': [{'title': "Antiques Roadkill: A Trash 'n' Treasures Mystery", 'author': 'Barbara Allan', 'language': 'English', 'rating': '3.3', 'publisher': 'Kensington Publishing Corp.', 'pages': '288'}]},..........
+    """
+  
+  
+    new_list = {}
+    f = open("google_books_dataset.csv",'r')
+    read = f.readlines()
+    
+    for line in read:
+        row = line.split(',')    
+            
+        category = row[5]
+        if not category in new_list:
+            new_list[category] = []
+                
+        
+          
+        new_list[category].append( {"title": row[0],                  
+                              "author": row[1],
+                            "language": row[6],
+                            "rating": row[2],
+                            "publisher": row[3],
+                            "pages": row[4]})
+    f.close()
+    return new_list
+
+name_of_the_file = ("google_books_dataset.csv")
+book_dictionary = book_category_dictionary(name_of_the_file)
+
+def add_book(dict_list:dict,argument:tuple)->List:
+    
+    """
+     returns 'There was an error adding the book' if the book is already present in the dictionary and
+     it returns 'The book has been added correctly' if the book is not present and updates the dictionary with the new given book
+     
+     
+>>>add_book(dictionary_set1,('Tom and Jerry','B A Paris','3.8','HarperCollins UK','368','Crime','English'))
+   The book has been added correctly
+   {'category': [{'title': 'title', 'author': 'author', 'language': 'language', 'rating': 'rating', 'publisher': 'publisher', 'pages': 'pages'}], 'Fiction':.........
+   
+>>>add_book(dictionary_set1,('Pirates of the Carribean','JK Rowling','4.7','Indiana US','400','Action','English'))
+   The book has been added correctly
+   {'category': [{'title': 'title', 'author': 'author', 'language': 'language', 'rating': 'rating', 'publisher': 'publisher', 'pages': 'pages'}], 'Fiction':.........
+   
+>>>add_book(dictionary_set1, ('Submarine ', 'Alex Lake', '4.1', 'HarperCollins UK','416','Fiction','English'))
+   The book has been added correctly
+   {'category': [{'title': 'title', 'author': 'author', 'language': 'language', 'rating': 'rating', 'publisher': 'publisher', 'pages': 'pages'}], 'Fiction':.........
+   
+       """
+    dictionary_set = {}
+     
+         
+    for x in dict_list.keys():
+        book_got = dict_list.get(x) 
+          
+        for title in x:
+            if argument[0] in book_dictionary:
+                print(" There was an error adding the book")
+                return dict_list
+            else:
+                dict_list[argument[5]].append([argument[0],argument[1],argument[2],argument[3],argument[4],argument[5],argument[6]])
+                book_dictionary.update(dict_list)
+                print(" The book has been added correctly")
+                return book_dictionary
+
+def remove_book(title:str,category:str,dictionary_list:dict):
+    
+    """
+     Returns 'There was an error removing the book. Book not found.' if the book is not in the dictionary and 
+     returns ' The book has been removed correctly' if the book is found in the file and removes the book from the dictionary.
+
+>>>remove_book('Lion King','Adventure',dictionary_set1)
+   There was an error removing the book. Book not found.
+ 
+>>>remove_book('After Anna','Fiction',dictionary_set1)
+   The book has been removed correctly 
+   {'category': [{'title': 'title', 'author': 'author', 'language': 'language', 'rating': 'rating', 'publisher': 'publisher', 'pages': 'pages'}.....
+       
+     
+>>>remove_book('Peaky Blinders','Action',dictionary_set1)
+   There was an error removing the book. Book not found. """
+     
+    found = False
+    removed = None
+    if not category in dictionary_list:
+        print("There was an error removing the book. Book not found.")
+        return 
+    for book in dictionary_list[ category ]:
+        if book['title'] == title:
+            found = True
+            removed = book
+            break
+    if found:
+        dictionary_list[ category ].remove(removed)
+        print('The book has been removed correctly') 
+        return dictionary_list
+    else:
+        print('There was an error removing the book. Book not found.')
+
+def get_books_by_category(dictionary: dict, searched_category: str):
+    
+    """
+    Takes an input dictionary and category and returns a list of
+    all the novels and their corresponding author if the novel falls
+    under the input category. The function also returns the amount of novels 
+    in the category.
+    
+    eg 1.
+    >>> print(get_books_by_category(book_dictionary, 'Thrillers'))
+    
+    >>> The number of novels in this category is 18 and the books and their authors are as follows: 
+    [{'title': 'Little Girl Lost: A Lucy Black Thriller', 'author': 'Brian McGilloway'}, ext...]
+    
+    eg 2.
+    >>> print(get_books_by_category(book_dictionary, 'Fiction'))
+    
+    >>> The number of novels in this category is 39 and the books and their authors are as follows: 
+    [{'title': "Antiques Roadkill: A Trash 'n' Treasures Mystery", 'author': 'Barbara Allan'}, ext...]
+    
+    """
+    
+    books_by_category = []
+    count = 0
+        
+    for i in book_dictionary:
+        
+        keys = i.keys() 
+        
+        for key in keys:
+            
+            if key == searched_category:
+                count += 1
+                values = i.get(key)
+                
+                for item in values:
+                    
+                    title = item['title']
+                    author = item['author']
+                    books_by_category.append({'title': title,'author': author})
+  #  print(type(count))                
+  #  print("The number of novels in this category is", count,"and the books and their authors are as follows:",books_by_category)
+    return
+
+def get_books_by_rate(dictionary: dict, rating: int):
+    
+    """
+    Takes an input dictionary and rate as an int. The function returns ther title
+    and author of all the novels which have a rating that falls in between the input
+    rating and the rating 1 above that of the input.
+    
+    eg 1.
+    >>> print(get_books_by_rate(book_dictionary, 3))
+    
+    >>> The number of books in the rating 3 is 19. This includes:
+        [{'title': 'Antiques Roadkill: A Trash 'n' Treasures Mystery', 'author': 'Barbara Allan'}, ext...]
+    
+    """
+    
+    books_by_rating = []
+    count = 0
+  
+    for i in dictionary:
+            
+        values = i.values() 
+            
+        for new_values in values:
+            
+            new_dict = new_values[0]
+            bookrating = new_dict.get('rating')
+            if int(rating) < int(float(bookrating)) < int(rating + 1):
+             
+                title = new_dict.get("title")
+                author = new_dict.get("author")
+                books_by_rating.append({"title":title, "author":author})
+                
+    print("The number of books in the rating", rating, "is", len(books_by_rating), ". This includes:", books_by_rating)
+    return 
+
+def get_books_by_title(book_dictionary:dict,title:str)->bool:
+    """
+    Returns true if the book has been found in the dictionary and it returns false if the book is not in the dictionary.
+     
+    >>>get_books_by_title(dictionary_set1,"Harry Potter")
+    The book has NOT been found
+    False 
+    
+    >>>get_books_by_title(dictionary_set1,"After Anna")
+    The book has been found 
+    True
+    
+    >>>get_books_by_title(dictionary_set1,"Game of thrones")
+    The book has NOT been found
+    False
+    """
+    result = book_dictionary.values()
+    for books in result:
+        for book in books:
+            if book['title'] == title:
+                print('The book has been found')
+                return True
+    if not books in result:
+        print('The book has NOT been found')
+        return False                     
+
+def get_books_by_author(dictionary: dict, input_author: str):
+    
+    """
+    Takes an input dictionary as well as author name and returns the amount of
+    novels the author has published aswell as the titles and rating of the novels.
+    
+    eg 1.
+    >>> print(get_books_by_author(book_dictionary, 'Barbara Allan'))
+    
+    >>> Barbara Allan has published 4 book(s): 
+    [{'title': "Antiques Roadkill: A Trash 'n' Treasures Mystery", 'rating': '3.3'}, 
+    {'title': 'Antiques Con', 'rating': '4.8'}, ext...]
+    
+    eg 2.
+    >>> print(get_books_by_author(book_dictionary, 'Peter V. Brett'))
+    
+    >>> Peter V. Brett has published 1 book(s): 
+    [{'title': 'The Painted Man (The Demon Cycle. Book 1)', 'rating': '4.5'}]
+    """
+    
+    final_lst = []
+    books_by_author = []
+    
+    for i in dictionary:
+            
+        values = i.values() 
+            
+        for dictvalues in values:
+            
+            somedict = dictvalues[0]
+            the_author = somedict.get('author')
+            if the_author == input_author:
+                
+                title = somedict.get('title')
+                rating = somedict.get('rating')
+                books_by_author.append({'title':title, 'rating':rating})
+                
+    for i in books_by_author:
+        if i not in final_lst:
+            final_lst.append(i)
+    
+    print(input_author,"has published",len(final_lst),"book(s):", final_lst)
+    
+    return 
+
+def get_books_by_publisher(dictionary: dict, input_publisher: str):
+    """
+    Takes a dictionary and the name of the publisher as the input and it returns the publishers and their associated books
+>>>get_books_by_publisher(book_dictionary, 'HarperCollins UK')
+    """
+    
+    lst = []
+    books_by_publisher = []
+    
+    for i in book_dictionary:
+            
+        val = i.val() 
+            
+        for dict_val in val:
+            
+            some_dict = dict_val[0]
+            publisher = some_dict.get('publisher')
+            if publisher == input_publisher:
+                
+                title = somedict.get('title')
+                ratings = somedict.get('rating')
+                books_by_publisher.append({'title':title, 'rating':ratings})
+                
+    for i in books_by_author:
+        if i not in final_lst:
+            final_lst.append(i)
+    
+   # print(input_publisher,"has published",len(final_lst),"book(s):", final_lst)
+    
+    return 
+
+def get_all_categories_for_book_title(data:dict,name:str)->int:
+    """
+    Returns number of books created by the author whose name is given.
+    >>>get_books_by_author(dictionary,"Barbara Allan")
+    4
+    >>>get_books_by_author(dictionary,"Peter V. Brett")
+    1
+    >>>get_books_by_author(dictionary,"Brandon Sanderson")
+    2
+    """
+    category=[]
+    for i in data:
+        cata_values=i.values()
+        for cata_value in cata_values:
+            for lst in cata_value:
+                if lst.get('title')==name:
+                    if lst.get('category') not in category:
+                        category.append(str(i.keys()))
+    print("The book title "+name+"belongs to the following categories")
+    num=0
+    for cates in category:
+        book=category[num]
+        print("Category "+str(num+1)+": "+cates)
+        num+=1
+    return len(category)
+
+#print(get_all_categories_for_book_title(dictionary,"The Memoirs of Sherlock Holmes"))
+
+def sort_books_title(dictionary:dict)->List[dict]:
+    
+    """
+    The function sort_books_title() takes a dictionary as an 
+    input parameter and it returns a list with the book data stored as a
+    dictionary book where the books are sorted alphabetically by title using 
+    bubble sort method.
+    
+>>>sort_books_title("google_books_dataset.csv")
+
+   [{'title': "'Salem's Lot", 'author': 'Stephen King', 'language': 'English\n', 'rating': '4.4', 'publisher': 'Hachette UK', 'pages': '300'}, 
+   {'title': "'Salem's Lot", 'author': 'Stephen King', 'language': 'English\n', 'rating': '4.4', 'publisher': 'Hachette UK', 'pages': '300'}, 
+   {'title': 'A Feast for Crows (A Song of Ice and Fire. Book 4)', 'author': 'George R.R. Martin', 'language': 'English\n', 'rating': '4.5', 'publisher': 'HarperCollins UK', 'pages': '864'}
+   ,....} 0]
+   """
+    book_dictionary = book_category_dictionary(dictionary)
+    
+    book_list = []
+    n = len(book_list)        
+    for category in book_dictionary:
+        dictionary_get = (book_dictionary.get(category))
+        
+        
+        for book in dictionary_get:
+            book_list.append(book)
+            
+    n = len(book_list)        
+    for i in range(n):  
+        
+        
+        for j in range(n-i-1):
+            x = book_list[j]
+            y = book_list[j + 1]
+            if x['title'] > y['title']:                                  
+                book_list[j], book_list[j + 1] = book_list[j + 1], book_list[j]         
+                
+                
+    for i in range(n):
+        book_list.append(i)
+                
+        return book_list
+        
+def sort_books_publisher(book_dictionary: dict)-> list:
+    
+    """
+    The function accepts a dictionary as input and outputs a list with each novel saved in a dictionary and ordered alphabetically by publisher name. If a publisher has numerous 
+    novels, the function retrieves them in alphabetical order by title within the same list.
+    
+    EX 1:
+    >>> sort_books_publisher('google_books_dataset.csv')
+    
+    [{'title': 'Marketing (The Brian Tracy Success Library)', 'author': 'Brian Tracy', 'language': 'English', 'rating': 'N/A', 'publisher': 'AMACOM', 'pages': '112'},
+    {'title': 'The Red Signal: An Agatha Christie Short Story', 'author': 'Agatha Christie', 'language': 'English', 'rating': '5', 'publisher': 'AMACOM', 
+    'pages': '40'}, ext...]5
+    
+    """
+    
+    _list = book_category_dictionary(book_dictionary)
+    
+    new_list = []
+    
+    for category in _list:
+        books = (_list.get(category))
+        
+        
+        for book in books:
+            new_list.append(book)
+            
+    n = len(new_list)        
+    for i in range(n):
+        
+        for j in range(n - 1 - i):
+            x, y = new_list[j], new_list[j + 1]
+            if x['publisher'] > y['publisher']:                                   
+                new_list[j], new_list[j + 1] = new_list[j + 1], new_list[j]             
+        
+    for i in range(n):
+        new_list.append(i)
+        return new_list
+    
+def sort_books_author(book_dictionary: dict)-> list:
+    
+    """
+    The function takes a dictionary input parameter and returns a list where each novel
+    is stored in a dictionary and sorted by the author name in alphabetical order.
+    If the author has published multiple novels, the function returns those novels
+    by title in alphabetical order within the same list.
+    
+    EX :
+    >>> sort_books_author('google_books_dataset.csv')
+    
+    >>> [{'title': 'Twas The Nightshift Before Christmas: Festive hospital diaries from the author of million-copy hit This is Going to Hurt', 'author': 'Adam Kay', 'language': 'English', 'rating': '4.7', 'publisher': 'Pan Macmillan', 'pages': '112'},
+        {'title': 'Selling 101: What Every Successful Sales Professional Needs to Know', 'author': 'Zig Ziglar', 'language': 'English', 'rating': '3.8', 'publisher': 'HarperCollins Leadership', 'pages': '112'}, ext...]
+        
+    """
+    
+    lst = book_category_dictionary(book_dictionary)
+    
+    new_lst = []
+    
+    for category in lst:
+        books = (lst.get(category))
+        
+        for book in books:
+            new_lst.append(book)
+            
+    n = len(new_lst)        
+    
+    for i in range(n):
+        
+        for j in range(n - 1 - i):
+            x, y = new_lst[j], new_lst[j + 1]
+            
+            if x['author'] > y['author']:                                    
+                new_lst[j], new_lst[j + 1] = new_lst[j + 1], new_lst[j]
+                
+            if x['author'] == y['author']:                                   
+                if x['title'] > y['title']:                                  
+                    new_lst[j], new_lst[j + 1] = new_lst[j + 1], new_lst[j]
+
+    return new_lst
+
+def sort_books_ascending_rate(book_dictionary: dict) -> list:
+    
+    """
+    The function takes a dictionary as an input parameter and returns a list where each novel
+    is stored in a dictionary and sorted by the rating name in ascending order.
+    If the novel has the same rating, the function returns those novels by title in alphabetical order
+    with in the list.
+    The function also returns the novels with no rating first sorted by title in alphabetical order.
+    
+    EX :
+    >>> sort_books_ascending_rate('google_books_dataset.csv')
+    
+    >>> [{'title': 'Business Strategy (The Brian Tracy Success Library)', 'author': 'Brian Tracy', 'language': 'English', 'rating': 'N/A', 'publisher': 'AMACOM', 'pages': '112'},
+        {'title': 'Selling 101: What Every Successful Sales Professional Needs to Know', 'author': 'Zig Ziglar', 'language': 'English', 'rating': '3.8', 'publisher': 'HarperCollins Leadership', 'pages': '112'},
+        {'title': 'Twas The Nightshift Before Christmas: Festive hospital diaries from the author of million-copy hit This is Going to Hurt', 'author': 'Adam Kay', 'language': 'English', 'rating': '4.7', 'publisher': 'Pan Macmillan', 'pages': '112'}, ext....]
+        
+    """
+    
+    lst = book_category_dictionary(book_dictionary)
+    
+    first_lst = []
+    second_lst = []
+    third_lst = []
+    
+    
+    for category in lst:
+        books = (lst.get(category))
+        
+        for book in books:
+            if book['rating'] == 'N/A':
+                
+                third_lst.append(book)
+            else:
+                second_lst.append(book)
+                
+    m = len(third_lst)
+    
+    for w in range(m):
+        
+        for k in range(m - 1 - w):
+            a, b = third_lst[k], third_lst[k + 1]
+            
+            if a['title'] > b['title']:
+                third_lst[k], third_lst[k + 1] = third_lst[k + 1], third_lst[k]
+                 
+    n = len(second_lst)
+    
+    for i in range(n):
+        
+        for j in range(0, n - 1 - i):
+        
+            x, y = second_lst[j], second_lst[j + 1]
+               
+            if x['rating'] > y['rating']:
+                second_lst[j], second_lst[j + 1] = second_lst[j + 1], second_lst[j]
+            
+            if x['rating'] == y['rating']:
+                if x['title'] > y['title']: 
+                    second_lst[j], second_lst[j + 1] = second_lst[j + 1], second_lst[j]
+                
+    first_lst = third_lst + second_lst
+    
+    return first_lst
+
+def sort_book_commands(choice:str):  #Case 4
+    """
+    This function uses the sort commands and returns the output to the specified letter
+    sort_book_commands('r')  
+    {'title': 'Business Strategy (The Brian Tracy Success Library)', 'author': 'Brian Tracy', 'language': 'English\n', 'rating': 'N/A', 'publisher': 'AMACOM', 'pages': '112'}.....
+    """
+    if choice == 'T' or choice == 't': 
+        return sort_books_title("google_books_dataset.csv")
+    elif choice  == 'R' or choice == 'r':
+        return sort_books_ascending_rate('google_books_dataset.csv')
+    elif choice == 'P' or choice == 'p': 
+        return sort_books_publisher('google_books_dataset.csv')
+    elif choice == 'A' or choice == 'a':
+        return sort_books_author('google_books_dataset.csv')   
+    else:
+        print("File not loaded")
+        
+        
+def get_book_command(input_command:str): # Case 2 and 3
+    
+    """
+    This functions uses the get commands and returns the output to the specified letter
+    get_book_command('a')
+    Please specify the author you would like to search by: Barbara Allan
+    >>>> Barbara Allan has published 4 book(s): 
+    [{'title': "Antiques Roadkill: A Trash 'n' Treasures Mystery", 'rating': '3.3'}, 
+    {'title': 'Antiques Con', 'rating': '4.8'}, ext...]
+    """
+    
+    if input_command == 'A':
+        print('Please specify the author you would like to search by: ')
+        input_author = input()
+        author = get_books_by_author('google_books_dataset.csv', input_author)
+        print(author)
+    
+    elif input_command == 'T':
+        print('Please specify the title you would like to search: ')
+        input_title = input()
+        title = get_books_by_title('google_books_dataset.csv', input_title)
+        print(title)
+        
+    elif input_command == 'R':
+        print('Please specify the rating you would like to search by: ')
+        input_rating = input()
+        title = get_books_by_rate('google_books_dataset.csv', input_rating)
+        print(title)
+        
+    if input_command == 'P':
+        print('Please specify the Publisher you would like to search by: ')
+        new_input = input()
+        publisher = get_books_by_publisher('google_books_dataset.csv', new_input)
+        print(publisher)
+            
+    elif input_command == 'C':
+        print('Please specify the category you would like to search by: ')
+        new_input = input()
+        category = get_books_by_category('google_books_dataset.csv', new_input)
+        print(category)     
+      
+
+def add_remove_commands(result:str):    #Case 1
+    
+     
+    """
+     add_remove_commands('a')
+     Enter title name: Peaky Blinders
+     Enter author name: Astra
+     Enter the langugae: English
+     Enter the rating: 4.5
+     Enter the category: Fiction
+     Enter publisher name: HarperCollins UK
+     Enter the no of pages: 345
+     
+    add_remove_commands('r')
+    Enter title name: Peaky Blinders
+    Enter category name: Action 
+    """
+    
+    if result == 'A' or result == 'a':
+        print("---------------")
+        title = input("Enter title name:")
+        print("---------------")
+        author = input("Enter author name:")
+        print("---------------")
+        language = input("Enter the language:")
+        print("---------------")
+        rating = input("Enter the rating:")
+        print("---------------")
+        category = input("Enter the category:")
+        print("---------------")
+        publisher = input("Enter publisher name:")
+        print("---------------")
+        pages = input("Enter the no of pages:")
+        print("---------------")
+        return add_book(book_dictionary,('title','author','rating','publisher','pages','category','language'))
+    
+    elif result == 'R' or result == 'r':
+        print("---------------")
+        title= (input("Enter title name:"))
+        print("---------------")
+        category = (input("Enter category name:"))
+        print("---------------")
+        return remove_book('title','category',book_dictionary)
+    
+    else:
+        print("---------------")
+        print("Not found")
+        print("---------------")
+        
+        
+def menu():
+    """
+    Returns the command menu with the specified letters 
+    The available commands are:
+    1-  L)oad data
+    2-  A)dd book
+    3-  R)emove book
+    4-  G)et book
+    T)itle R)ate A)uthor P)ublisher C)ategory
+    5 - GCT)Get all categories for book Title
+    6 - S)ort books
+    T)itle R)ate P)ublisher A)uthor 
+    7 - Q)uit
+    ---------------
+    Please type your command: r
+    ---------------
+    Enter title name: Peaky Blinders
+    ---------------
+    Enter category name: Fiction
+    ---------------
+    There was an error removing the book. Book not found.
+    """    
+    print("1-  L)oad data")
+    print("2-  A)dd book")
+    print("3-  R)emove book")
+    print("4-  G)et book")
+    print("T)itle R)ate A)uthor P)ublisher C)ategory")
+    print("5 - GCT)Get all categories for book Title")
+    print("6 - S)ort books")
+    print("T)itle R)ate P)ublisher A)uthor ")
+    print("7 - Q)uit")
+    return
+
+
+while True:
+        menu()
+        print("---------------")
+        choice = input("Please type your command: ")
+        if not (choice == 'Q' or choice == 'q' or choice == 'L' or choice == 'l' or choice == 'G' or choice == 'g' or choice == 'GCT' or choice == 'gct' or choice == 's' or choice == 'S' or choice == 'A' or choice == 'a' or choice == 'R' or choice == 'r'):
+            print(" No such command")
+        if choice == 'Q'or choice == 'q':
+            exit()   
+        elif choice == 'L'or choice == 'l':
+            print("---------------")
+            load = input("Enter the name of the file to be loaded: ")
+            print("---------------")
+            if load == 'google_books_dataset.csv':
+                print("The specified file: google_books_dataset.csv has been loaded successfully")
+            else:
+                print("---------------")
+                print(" No such directory/file found")            
+                print("---------------")
+        elif choice == 'A'or choice == 'a':
+            add_remove_commands(choice)
+        elif choice == 'R'or choice == 'r':
+            add_remove_commands(choice)
+            
+        elif choice == 'S'or choice == 's':
+            print("----------------")
+            print("T)itle R)ate P)ublisher A)uthor")
+            print("Which attribute do you want to sort?")
+            print("----------------")
+            actual = input("Please type your command: ")
+            if not (actual in "T t R r A a P p"):
+                print(" No such command")
+            if actual == 'T'or actual == 't':
+                title = sort_book_commands('T')
+                for i in title:
+                    print(i)
+            if actual == 'R'or actual == 'r':
+                rate = sort_book_commands('R')
+                for i in rate:
+                    print(i)
+            if actual == 'A'or actual == 'a':
+                author = sort_book_commands('A')
+                for i in author:
+                    print(i)
+            if actual == 'P'or actual == 'p':
+                publisher = sort_book_commands('P')
+                for i in publisher:
+                    print(i)    
+                    
+        elif choice == 'g' or choice == 'G':
+            
+            print("T)itle R)ate A)uthor P)ublisher C)ategory")
+            input_command = input("Please type your command: ")
+            if not(input_command == "A" or input_command == 'a' or input_command == 'T'or input_command == 't' or input_command == 'R'or input_command == 'r' or input_command == 'P' or input_command == 'p' or input_command == 'C' or input_command == 'c'):
+                print("No such command")
+                
+            if input_command == 'A'or input_command == 'a':
+                get_book_command('A')
+            
+            elif input_command == 'T'or input_command == 't':
+                get_book_command('T')
+                
+            elif input_command == 'R'or input_command == 'r':
+                get_book_command('R')
+                
+            if input_command == 'P'or input_command == 'p':
+                get_book_command('P')
+                    
+            elif input_command == 'C'or input_command == 'c':
+                get_book_command('C')            
+   
+        elif choice == 'GCT' or choice == 'gct':
+            print('Please specify the book title you would like to get the categories for')
+            new_input = input()
+            get_categories = get_books_by_publisher('google_books_dataset.csv', new_input)
+            print(get_categories)             
+            
